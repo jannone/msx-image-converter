@@ -10,14 +10,12 @@
   "author": "Rafael Jannone <jannone@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "color-space": "^1.16.0",
     "decode-tiff": "^0.2.1",
-    "mse": "^0.1.0",
     "pngjs": "^3.3.3"
   },
   "devDependencies": {
-    "@types/node": "^11.10.4",
     "@types/jest": "^20.0.8",
+    "@types/node": "^11.10.4",
     "jest": "^24.3.1",
     "ts-jest": "^24.0.0",
     "typescript": "^3.3.3333"
