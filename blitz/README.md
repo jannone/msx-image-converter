@@ -1,0 +1,1 @@
+This is the original source code by Leandro Correia made in Blitz Basic

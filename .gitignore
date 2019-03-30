@@ -59,3 +59,6 @@ typings/
 
 # next.js build output
 .next
+
+# some test images used as experiment
+images/
