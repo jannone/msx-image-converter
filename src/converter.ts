@@ -1,5 +1,5 @@
-import { calcdist2000 } from './ciede'
-import { RGBColor, Image } from './common'
+import { rgb_to_lab, ciede2000Lab } from './ciede'
+import { RGBColor, Image, LabColor } from './common'
 import { getPixel, plot, createImage } from './image'
 
 // Color tolerance for dithering (from 0 to 100). 
@@ -34,9 +34,7 @@ const mixedColor = (c1: RGBColor, c2: RGBColor): RGBColor => {
   }
 }
 
-const colorDist = (c1: RGBColor, c2: RGBColor) => {
-  return calcdist2000(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b)
-}
+const colorDistLab = (l1: LabColor, l2: LabColor) => ciede2000Lab(l1.l, l1.a, l1.b, l2.l, l2.a, l2.b)
 
 // TIP: images are usually better converted to MSX1 if contrast is increased
 // and a sharpen effect is used after reducing them.
@@ -46,14 +44,16 @@ export const convert = (image: Image, palette: RGBColor[]): Image => {
   let y = 0
   let x = 0
 
+  const labPalette = palette.map((c) => rgb_to_lab(c))
+
   const buffer = createImage(image.width, image.height, {r: 0, g: 0, b: 0})
 
   while (y < image.height) {
-    const octet = []
+    const octet: LabColor[] = []
     let bestdistance = 99999999
     for (let i = 0; i < 8; i++) {
       // Get the RGB values of 8 pixels of the original image
-      const pixel = getPixel(image, x+i, y)
+      const pixel = rgb_to_lab( getPixel(image, x+i, y) )
       octet.push(pixel)
     }
     
@@ -67,25 +67,25 @@ export const convert = (image: Image, palette: RGBColor[]): Image => {
         
         let dist = 0
         
-        let tone = [
+        const tone = [
           // first MSX color of the octet
-          palette[c1],
+          labPalette[c1],
           // a mix of both MSX colors RGB values
           // since MSX cannot mix colors, later if this color is chosen it'll be substituted by a 2x2 dithering pattern
-          mixedColor(palette[c1], palette[c2]),
+          rgb_to_lab( mixedColor(palette[c1], palette[c2]) ),
           // second MSX color of the octet
-          palette[c2],
+          labPalette[c2],
         ]
       
         // if colors are not too distant, octect can be either dithered or not
         let finaldist
-        let octetvalue = [0, 0, 0, 0, 0, 0, 0, 0]
-        if (colorDist(palette[c1], palette[c2]) <= tolerance) {
+        const octetvalue = [0, 0, 0, 0, 0, 0, 0, 0]
+        if (colorDistLab(labPalette[c1], labPalette[c2]) <= tolerance) {
           // dithered
           let distcolor = [0, 0]
           for (let i = 0; i < 8; i++) {
               for (let j = 0; j <= 2; j++) {
-                distcolor[j] = colorDist(tone[j],octet[i])
+                distcolor[j] = colorDistLab(tone[j],octet[i])
               }
               finaldist = distcolor[0]
               octetvalue[i] = 0
@@ -103,8 +103,8 @@ export const convert = (image: Image, palette: RGBColor[]): Image => {
         } else {
           // not dithered
           for (let i = 0; i < 8; i++) {
-            const finaldista = colorDist(tone[0],octet[i]) 
-            const finaldistb = colorDist(tone[2],octet[i])
+            const finaldista = colorDistLab(tone[0],octet[i]) 
+            const finaldistb = colorDistLab(tone[2],octet[i])
             if (finaldista < finaldistb) {
               octetvalue[i] = 0
               finaldist = finaldista
@@ -152,15 +152,15 @@ export const convert = (image: Image, palette: RGBColor[]): Image => {
           col = palette[bestcolor2]
           break;
       }
-      plot(buffer, 256+x+i, y, col)
+      plot(buffer, x+i, y, col)
     }
     y++
     if ((y % 8) == 0) {
-      y = y - 8
-      x = x + 8
+      y -= 8
+      x += 8
       if (x > 255) {
         x = 0
-        y = y + 8
+        y += 8
       }
     }
     // This would be the place for you to write the bytes in the final MSX screen file.

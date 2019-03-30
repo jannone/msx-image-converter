@@ -10,6 +10,18 @@ export type RGBColor = {
   b: number
 } 
 
+export type XYZColor = {
+  x: number,
+  y: number,
+  z: number
+} 
+
+export type LabColor = {
+  l: number,
+  a: number,
+  b: number
+} 
+
 export interface Rect {
   x: number,
   y: number,
