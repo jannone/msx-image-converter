@@ -1,6 +1,7 @@
 import { readImage } from "./decoder"
-import { savePNG, createImage, contrast } from "./image"
+import { savePNG, createImage } from "./image"
 import * as converter from "./converter"
+import { contrast } from "./filter"
 
 const convertImage = (inputFilename: string, outputFilename: string, contrastAmount: number) => {
   const image = readImage(inputFilename)

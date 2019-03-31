@@ -1,6 +1,6 @@
 import 'jest'
 
-import { createImage, contrast, getPixel, plot } from "../src/image"
+import { createImage, getPixel, plot } from "../src/image"
 
 describe("Image functions", () => {
   it("must create image with given size and color", () => {
@@ -30,12 +30,4 @@ describe("Image functions", () => {
     ]))
   })
 
-  it("must apply contrast to image", () => {
-    const image = createImage(1, 1, {r: 200, g: 128, b: 100})
-    const output = createImage(1, 1, {r: 0, g: 0, b: 0})
-    contrast(image, output, 100)
-    expect(output.data).toEqual(Buffer.from([
-      255, 128, 64, 255
-    ]))
-  })
 })
