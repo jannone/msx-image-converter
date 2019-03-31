@@ -68,68 +68,72 @@ export function ciede2000Lab(L1: number, a1: number, b1: number, L2: number, a2:
   return dE;
 }
 
-function degrees(n) { return n*(180/PI); }
-function radians(n) { return n*(PI/180); }
+const degrees = (n: number) => n*(180/PI)
+const radians = (n: number) => n*(PI/180)
 
-function hp_f(x,y) //(7)
-{
-  if(x === 0 && y === 0) return 0;
-  else{
-    const tmphp = degrees(atan2(x,y));
-    if(tmphp >= 0) return tmphp
-    else           return tmphp + 360;
+//(7)
+const hp_f = (x: number, y: number): number => {
+  if (x === 0 && y === 0) {
+    return 0
+  }
+  const tmphp = degrees(atan2(x,y))
+  return (tmphp >= 0) ? tmphp : tmphp + 360
+}
+
+//(10)
+const dhp_f = (C1: number, C2: number, h1p: number, h2p: number): number => {
+  if (C1 * C2 === 0) {
+    return 0
+  }
+  const delta = h2p - h1p
+  if (abs(delta) <= 180) return delta
+  if (delta > 180)       return delta - 360
+  if (delta < -180)      return delta + 360
+  throw new Error()
+}
+
+//(14)
+const a_hp_f = (C1: number, C2: number, h1p: number, h2p: number): number => { 
+  const sum = h1p + h2p
+  if (C1 * C2 === 0) {
+    return sum
+  }
+  const delta = h1p-h2p
+  if (abs(delta)<= 180)  return sum / 2.0
+  if ((abs(delta) > 180) && (sum < 360))  return (sum + 360) / 2.0
+  if ((abs(delta) > 180) && (sum >= 360)) return (sum - 360) / 2.0
+  throw new Error()
+}
+
+export const rgb_to_lab = (c: RGBColor): LabColor => xyz_to_lab(rgb_to_xyz(c))
+
+const rgb_to_xyz = (c: RGBColor): XYZColor => {
+  // Based on http://www.easyrgb.com/index.php?X=MATH&H=02
+  const cR = ( c.r / 255 )
+  const cG = ( c.g / 255 )
+  const cB = ( c.b / 255 )
+
+  const R = 100 * 
+    (( cR > 0.04045 ) ? 
+      pow(( ( cR + 0.055 ) / 1.055 ),2.4) : cR / 12.92)
+
+  const G = 100 * 
+    (( cG > 0.04045 ) ? 
+      pow(( ( cG + 0.055 ) / 1.055 ),2.4) : cG / 12.92)
+
+  const B = 100 * 
+    (( cB > 0.04045 ) ? 
+      pow(( ( cB + 0.055 ) / 1.055 ), 2.4) : cB / 12.92)
+
+  // Observer. = 2°, Illuminant = D65
+  return {
+    x: R * 0.4124 + G * 0.3576 + B * 0.1805,
+    y: R * 0.2126 + G * 0.7152 + B * 0.0722,
+    z: R * 0.0193 + G * 0.1192 + B * 0.9505
   }
 }
 
-function dhp_f(C1, C2, h1p, h2p) //(10)
-{
-  if(C1*C2 === 0)              return 0;
-  else if(abs(h2p-h1p) <= 180) return h2p-h1p;
-  else if((h2p-h1p) > 180)     return (h2p-h1p)-360;
-  else if((h2p-h1p) < -180)    return (h2p-h1p)+360;
-  else                         throw(new Error());
-}
-
-function a_hp_f(C1, C2, h1p, h2p) { //(14)
-  if(C1*C2 === 0)                                     return h1p+h2p
-  else if(abs(h1p-h2p)<= 180)                         return (h1p+h2p)/2.0;
-  else if((abs(h1p-h2p) > 180) && ((h1p+h2p) < 360))  return (h1p+h2p+360)/2.0;
-  else if((abs(h1p-h2p) > 180) && ((h1p+h2p) >= 360)) return (h1p+h2p-360)/2.0;
-  else                                                throw(new Error());
-}
-
-export function rgb_to_lab(c: RGBColor): LabColor
-{
-  return xyz_to_lab(rgb_to_xyz(c))
-}
-
-function rgb_to_xyz(c: RGBColor): XYZColor
-{
-  // Based on http://www.easyrgb.com/index.php?X=MATH&H=02
-  let R = ( c.r / 255 );
-  let G = ( c.g / 255 );
-  let B = ( c.b / 255 );
-
-  if ( R > 0.04045 ) R = pow(( ( R + 0.055 ) / 1.055 ),2.4);
-  else               R = R / 12.92;
-  if ( G > 0.04045 ) G = pow(( ( G + 0.055 ) / 1.055 ),2.4);
-  else               G = G / 12.92;
-  if ( B > 0.04045 ) B = pow(( ( B + 0.055 ) / 1.055 ), 2.4);
-  else               B = B / 12.92;
-
-  R *= 100;
-  G *= 100;
-  B *= 100;
-
-  // Observer. = 2°, Illuminant = D65
-  const x = R * 0.4124 + G * 0.3576 + B * 0.1805;
-  const y = R * 0.2126 + G * 0.7152 + B * 0.0722;
-  const z = R * 0.0193 + G * 0.1192 + B * 0.9505;
-  return { x, y, z }
-}
-
-function xyz_to_lab(c: XYZColor): LabColor
-{
+const xyz_to_lab = (c: XYZColor): LabColor => {
   // Based on http://www.easyrgb.com/index.php?X=MATH&H=07
   const ref_Y = 100.000;
   const ref_Z = 108.883;
@@ -143,8 +147,10 @@ function xyz_to_lab(c: XYZColor): LabColor
   else                Y = ( 7.787 * Y ) + ( 16 / 116 );
   if ( Z > 0.008856 ) Z = pow(Z, 1/3);
   else                Z = ( 7.787 * Z ) + ( 16 / 116 );
-  const l = ( 116 * Y ) - 16;
-  const a = 500 * ( X - Y );
-  const b = 200 * ( Y - Z );
-  return { l, a, b };
+
+  return {
+    l: ( 116 * Y ) - 16,
+    a: 500 * ( X - Y ),
+    b: 200 * ( Y - Z )
+  }
 }

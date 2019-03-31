@@ -1,3 +1,5 @@
+import 'jest'
+
 import * as fs from "fs"
 
 import { ciede2000Lab } from "../src/ciede"
