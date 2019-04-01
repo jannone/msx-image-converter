@@ -1,15 +1,15 @@
 import { readImage } from "./decoder"
 import { savePNG, createImage } from "./image"
 import * as converter from "./converter"
-import { contrast } from "./filter"
+import { contrast, sharpen } from "./filter"
 
 const convertImage = (inputFilename: string, outputFilename: string, contrastAmount: number) => {
   const image1 = readImage(inputFilename)
   const image2 = createImage(image1.width, image1.height)
   contrast(image1, image2, contrastAmount)
-
-  converter.convert(image2, image1, converter.msxPalette)
-  savePNG(image1, outputFilename)
+  sharpen(image2, image1, false)
+  converter.convert(image1, image2, converter.msxPalette)
+  savePNG(image2, outputFilename)
 }
 
 const showHelp = (errorMessage?: string) => {

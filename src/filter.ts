@@ -56,14 +56,20 @@ const convolution = (inputImage: Image, outputImage: Image, weights: Convolution
   return dst
 }
 
-export const sharpen = (inputImage: Image, outputImage: Image) => {
-  convolution(inputImage, outputImage, kernelSharpen(), true)
+export const sharpen = (inputImage: Image, outputImage: Image, hard: boolean) => {
+  convolution(inputImage, outputImage, hard ? kernelSharpenHard() : kernelSharpenSoft(), true)
 }
 
-export const kernelSharpen = (): ConvolutionKernel => {
+export const kernelSharpenHard = (): ConvolutionKernel => {
   return [ -1, -1, -1,
-    -1,  8, -1,
+    -1,  9, -1,
     -1, -1, -1 ]
+}
+
+export const kernelSharpenSoft = (): ConvolutionKernel => {
+  return [ 0, -1, 0,
+    -1,  5, -1,
+    0, -1, 0 ]
 }
 
 export const kernelSobel = (): ConvolutionKernel => {

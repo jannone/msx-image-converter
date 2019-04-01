@@ -156,7 +156,7 @@ export const convert = (inputImage: Image, outputImage: Image, palette: RGBColor
     if ((y % 8) == 0) {
       y -= 8
       x += 8
-      if (x > 255) {
+      if (x >= inputImage.width) {
         x = 0
         y += 8
       }

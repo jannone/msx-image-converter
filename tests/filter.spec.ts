@@ -1,6 +1,6 @@
 import 'jest'
 
-import { createImage } from "../src/image"
+import { createImage, getPixel, plot } from "../src/image"
 import { contrast, sharpen } from '../src/filter'
 
 describe("Filter functions", () => {
@@ -14,13 +14,13 @@ describe("Filter functions", () => {
     ]))
   })
 
-  xit("must apply sharpen to image", () => {
+  it("must apply sharpen to image", () => {
     const image = createImage(3, 3, {r: 200, g: 128, b: 100})
     const output = createImage(3, 3)
-    sharpen(image, output)
-    expect(output.data).toEqual(Buffer.from([
-      200, 128, 100, 255
-    ]))
+    plot(image, 1, 0, {r: 255, g: 128, b: 100})
+    sharpen(image, output, false)
+    const pixel = getPixel(output, 1, 1)
+    expect(pixel).toEqual({r: 145, g: 128, b: 100})
   })
 
 })
