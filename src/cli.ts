@@ -4,12 +4,12 @@ import * as converter from "./converter"
 import { contrast } from "./filter"
 
 const convertImage = (inputFilename: string, outputFilename: string, contrastAmount: number) => {
-  const image = readImage(inputFilename)
-  const intermediate = createImage(image.width, image.height, {r: 0, g: 0, b: 0})
-  contrast(image, intermediate, contrastAmount)
+  const image1 = readImage(inputFilename)
+  const image2 = createImage(image1.width, image1.height)
+  contrast(image1, image2, contrastAmount)
 
-  const convertedImage = converter.convert(intermediate, converter.msxPalette)
-  savePNG(convertedImage, outputFilename)
+  converter.convert(image2, image1, converter.msxPalette)
+  savePNG(image1, outputFilename)
 }
 
 const showHelp = (errorMessage?: string) => {

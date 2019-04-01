@@ -14,20 +14,43 @@ export const getPixel = (image: Image, x: number, y: number): RGBColor => {
   } as RGBColor 
 }
 
-export const createImage = (width: number, height: number, color: RGBColor): Image => {
+export const fill = (image: Image, color: RGBColor) => {
+  const { width, height, data } = image
   const size = width * height * 4
-  const data = Buffer.allocUnsafe(size)
   for (let i = 0; i < size; i += 4) {
     data[i + 0] = color.r
     data[i + 1] = color.g
     data[i + 2] = color.b
     data[i + 3] = 255
   }
-  return {
+}
+
+export const fillByCoord = (image: Image, fn: (x: number, y: number) => RGBColor) => {
+  const { width, height, data } = image
+  let i = 0
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++, i += 4) {
+      const color = fn(x, y)
+      data[i + 0] = color.r
+      data[i + 1] = color.g
+      data[i + 2] = color.b
+      data[i + 3] = 255
+    }
+  }
+}
+
+export const createImage = (width: number, height: number, color?: RGBColor): Image => {
+  const size = width * height * 4
+  const data = Buffer.allocUnsafe(size)
+  const image: Image = {
     width,
     height,
     data
-  } as Image
+  }
+  if (color) {
+    fill(image, color)
+  }
+  return image
 }
 
 export const plot = (image: Image, x: number, y: number, color: RGBColor) => {

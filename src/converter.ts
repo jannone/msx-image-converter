@@ -40,20 +40,18 @@ const colorDistLab = (l1: LabColor, l2: LabColor) => ciede2000Lab(l1.l, l1.a, l1
 // and a sharpen effect is used after reducing them.
 // A good converter could allow the user to crop the image, resample it automatically and then allow user 
 // to increase contrast and sharpen it. ;)
-export const convert = (image: Image, palette: RGBColor[]): Image => {
+export const convert = (inputImage: Image, outputImage: Image, palette: RGBColor[]) => {
   let y = 0
   let x = 0
 
   const labPalette = palette.map((c) => rgb_to_lab(c))
 
-  const buffer = createImage(image.width, image.height, {r: 0, g: 0, b: 0})
-
-  while (y < image.height) {
+  while (y < inputImage.height) {
     const octet: LabColor[] = []
     let bestdistance = 99999999
     for (let i = 0; i < 8; i++) {
       // Get the RGB values of 8 pixels of the original image
-      const pixel = rgb_to_lab( getPixel(image, x+i, y) )
+      const pixel = rgb_to_lab( getPixel(inputImage, x+i, y) )
       octet.push(pixel)
     }
     
@@ -152,7 +150,7 @@ export const convert = (image: Image, palette: RGBColor[]): Image => {
           col = palette[bestcolor2]
           break;
       }
-      plot(buffer, x+i, y, col)
+      plot(outputImage, x+i, y, col)
     }
     y++
     if ((y % 8) == 0) {
@@ -165,6 +163,4 @@ export const convert = (image: Image, palette: RGBColor[]): Image => {
     }
     // This would be the place for you to write the bytes in the final MSX screen file.
   }
-
-  return buffer
 }
