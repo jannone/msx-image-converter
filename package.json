@@ -2,14 +2,21 @@
   "name": "msx-image-converter",
   "version": "1.0.0",
   "description": "MSX image converter based on Leandro Correia's source code",
-  "main": "index.js",
+  "main": "lib/cli.js",
+  "types": "lib/cli.d.ts",
   "scripts": {
     "test": "jest",
     "build": "tsc",
     "images": "ts-node src/converter.ts",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json"    
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
+  "keywords": ["msx", "msx-computers", "converter", "graphics", "typescript"],
   "author": "Rafael Jannone <jannone@gmail.com>",
   "license": "ISC",
   "dependencies": {
@@ -26,5 +33,6 @@
     "tslint": "^5.15.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.3.3333"
-  }
+  },
+  "files": [ "lib/**/*" ]
 }

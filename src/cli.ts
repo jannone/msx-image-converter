@@ -3,7 +3,7 @@ import { readImage } from './decoder'
 import { contrast, sharpen } from './filter'
 import { createImage, savePNG } from './image'
 
-const convertImage = (inputFilename: string, outputFilename: string, contrastAmount: number) => {
+export const convertImage = (inputFilename: string, outputFilename: string, contrastAmount: number) => {
   const image1 = readImage(inputFilename)
   const image2 = createImage(image1.width, image1.height)
   contrast(image1, image2, contrastAmount)
