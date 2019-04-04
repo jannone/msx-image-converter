@@ -1,7 +1,7 @@
-import { readImage } from "./decoder"
-import { savePNG, createImage } from "./image"
-import * as converter from "./converter"
-import { contrast, sharpen } from "./filter"
+import * as converter from './converter'
+import { readImage } from './decoder'
+import { contrast, sharpen } from './filter'
+import { createImage, savePNG } from './image'
 
 const convertImage = (inputFilename: string, outputFilename: string, contrastAmount: number) => {
   const image1 = readImage(inputFilename)
@@ -14,9 +14,11 @@ const convertImage = (inputFilename: string, outputFilename: string, contrastAmo
 
 const showHelp = (errorMessage?: string) => {
   if (errorMessage) {
-    console.error("\nERROR:", errorMessage, "\n")
+    // tslint:disable-next-line:no-console
+    console.error('\nERROR:', errorMessage, '\n')
   }
-  console.log("Syntax: ts-node src/cli.ts <input> <output> <contrast>\n")
+  // tslint:disable-next-line:no-console
+  console.log('Syntax: ts-node src/cli.ts <input> <output> <contrast>\n')
 }
 
 const main = () => {
@@ -24,17 +26,17 @@ const main = () => {
   const outputFilename = process.argv[3]
   const contrastAmount = process.argv[4] ? parseInt(process.argv[4], 10) : 0
   if (!imageFilename) {
-    return showHelp("missing input file")
+    return showHelp('missing input file')
   }
   if (!outputFilename) {
-    return showHelp("missing output file")
+    return showHelp('missing output file')
   }
   if (contrastAmount < -255 || contrastAmount > 255) {
-    return showHelp("contrast must be between -255 and 255")
+    return showHelp('contrast must be between -255 and 255')
   }
   convertImage(imageFilename, outputFilename, contrastAmount)
 }
 
-if (require.main === module) { 
+if (require.main === module) {
   main()
 }

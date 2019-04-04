@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "images": "ts-node src/converter.ts"
+    "build": "tsc",
+    "images": "ts-node src/converter.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json"    
   },
   "author": "Rafael Jannone <jannone@gmail.com>",
   "license": "ISC",
@@ -16,8 +19,12 @@
   "devDependencies": {
     "@types/jest": "^20.0.8",
     "@types/node": "^11.10.4",
+    "@types/pngjs": "^3.3.2",
     "jest": "^24.3.1",
+    "prettier": "^1.16.4",
     "ts-jest": "^24.0.0",
+    "tslint": "^5.15.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.3.3333"
   }
 }

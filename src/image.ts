@@ -1,8 +1,8 @@
-import fs = require("fs")
+import fs = require('fs')
 
-import { Image, RGBColor } from "./common"
+import { Image, RGBColor } from './common'
 
-const PNG = require('pngjs').PNG
+import { PNG } from 'pngjs'
 
 export const getPixel = (image: Image, x: number, y: number): RGBColor => {
   const { data, width } = image
@@ -10,8 +10,8 @@ export const getPixel = (image: Image, x: number, y: number): RGBColor => {
   return {
     r: data[addr],
     g: data[addr + 1],
-    b: data[addr + 2]
-  } as RGBColor 
+    b: data[addr + 2],
+  } as RGBColor
 }
 
 export const fill = (image: Image, color: RGBColor) => {
@@ -45,7 +45,7 @@ export const createImage = (width: number, height: number, color?: RGBColor): Im
   const image: Image = {
     width,
     height,
-    data
+    data,
   }
   if (color) {
     fill(image, color)

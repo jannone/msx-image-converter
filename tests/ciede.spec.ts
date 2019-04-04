@@ -4,7 +4,7 @@ import * as fs from "fs"
 
 import { ciede2000Lab } from "../src/ciede"
 
-const roundFloat = (v) => Math.round(parseFloat(v) * 10000) / 10000
+const roundFloat = (v: number) => Math.round(v * 10000) / 10000
 
 const givenCIEDEdata = () => {
   const data = fs.readFileSync("./tests/fixtures/ciede2000testdata.txt", "utf8")

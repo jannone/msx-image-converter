@@ -2,6 +2,13 @@
   "compilerOptions": {
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "lib": ["esnext"]
-  }
+    "lib": ["esnext"],
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./lib",
+    "strict": true  
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "tests", "**/__tests__/*"]
 }
