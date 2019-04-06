@@ -1,27 +1,33 @@
 import 'jest'
 
-import { convert, msxPalette } from '../src/converter'
-import { createImage, plot, getPixel, fillByCoord } from '../src/image'
+import { Image, Palette, RGBColor } from '../src/common'
+import { buildImageConverter, ConversionOptions, ImageFunctionsAdapter, ImageStorageAdapter } from '../src/converter'
+
+const givenAnImage = (): Image => {
+  return {
+    width: 8,
+    height: 8,
+    data: Buffer.allocUnsafe(8 * 8)
+  }
+}
 
 describe("Converter", () => {
-  it("must convert image with multiple of 8 size", () => {
-    const image = createImage(64, 8, msxPalette[12])
-    const output = createImage(64, 8)
-    convert(image, output, msxPalette)
-    const pixel = getPixel(output, 63, 7)
-    expect(pixel).toEqual(msxPalette[12])
-  })
-
-  it("must convert directly from palette colors", () => {
-    const image = createImage(256, 192)
-    const output = createImage(256, 192)
-    fillByCoord(image, (x, y) => {
-      return msxPalette[y % 16]
-    })
-    convert(image, output, msxPalette)
-    for (let i = 0; i < 16; i++) {
-      const pixel = getPixel(output, 0, i)
-      expect(pixel).toEqual(msxPalette[i])
+  it("must convert an image", () => {
+    const imageStorage: ImageStorageAdapter = {
+      readImage: (filename: string) => givenAnImage(),
+      saveImage: (image: Image, filename: string) => null
     }
+    const imageFunctions: ImageFunctionsAdapter = {
+      createImage: (width: number, height: number, color?: RGBColor) => givenAnImage(),
+      contrast: (inputImage: Image, outputImage: Image, amount: number) => null,
+      sharpen: (inputImage: Image, outputImage: Image, hard: boolean) => null,
+      quantize: (image1: Image, image2: Image, palette: Palette) => null
+    }
+    const options: ConversionOptions = {
+      palette: [ {r: 0, g: 0, b: 0} ],
+      contrastAmount: 0
+    }
+    const convertImage = buildImageConverter(imageStorage, imageFunctions)
+    convertImage("input.png", "output.png", options)
   })
 })

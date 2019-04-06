@@ -1,7 +1,7 @@
 import 'jest'
 
-import { createImage, getPixel, plot } from "../src/image"
 import { contrast, sharpen } from '../src/filter'
+import { createImage, getPixel, plot } from "../src/image"
 
 describe("Filter functions", () => {
 

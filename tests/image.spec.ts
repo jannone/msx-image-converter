@@ -1,6 +1,6 @@
 import 'jest'
 
-import { createImage, getPixel, plot, fillByCoord } from "../src/image"
+import { createImage, fillByCoord, getPixel, plot } from "../src/image"
 
 describe("Image functions", () => {
   it("must create image with given size and color", () => {
