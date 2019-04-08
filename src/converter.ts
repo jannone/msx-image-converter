@@ -30,7 +30,7 @@ export const buildImageConverter = (imageStorage: ImageStorageAdapter, imageFunc
   fileStorage: FileStorageAdapter) => {
   const { readImage, saveImage } = imageStorage
   const { createImage, contrast, sharpen, quantize, transform } = imageFunctions
-  const convertImage = (inputFilename: string, outputFilename: string, options: ConversionOptions) => {
+  const convertImage = (inputFilename: string, outputFilename: string|null, options: ConversionOptions) => {
     const image1 = readImage(inputFilename)
     const image2 = createImage(image1.width, image1.height)
     contrast(image1, image2, options.contrastAmount)
@@ -40,7 +40,9 @@ export const buildImageConverter = (imageStorage: ImageStorageAdapter, imageFunc
       saveImage(image2, options.previewFilename)
     }
     const dataBlocks = transform(image2, options.palette, MSX_DEFAULT_COLOR_INDEX)
-    fileStorage.saveDataBlocks(dataBlocks, outputFilename)
+    if (outputFilename) {
+      fileStorage.saveDataBlocks(dataBlocks, outputFilename)
+    }
   }
   return convertImage
 }

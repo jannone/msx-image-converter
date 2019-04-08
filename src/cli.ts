@@ -6,33 +6,65 @@ import {
   ImageStorageAdapter 
 } from "./converter"
 import { readImage } from "./decoder"
+import { generateScreenFile } from "./file"
 import { contrast, sharpen } from "./filter"
 import { createImage, savePNG } from "./image"
 import { msxPalette, quantize } from "./quantizer"
 import { DataBlocks, transform } from "./transformer"
 
-import fs = require('fs')
-import { generateScreenFile } from "./file";
+// tslint:disable-next-line:no-var-requires
+const commandLineArgs = require('command-line-args')
+// tslint:disable-next-line:no-var-requires
+const commandLineUsage = require('command-line-usage')
+
+const cliArgumentDefinitions = [
+  { name: 'input', alias: 'i', type: String, defaultOption: true,
+    description: 'PNG file to be converted', typeLabel: '{underline file.png}' },
+  { name: 'output', alias: 'o', type: String,
+    description: 'SCR file to be generated', typeLabel: '{underline file.scr}' },
+  { name: 'preview', alias: 'p', type: String,
+    description: 'PNG preview file to be generated', typeLabel: '{underline file.png}' },
+  { name: 'contrast', alias: 'c', type: Number,
+    description: 'Amount of contrast', typeLabel: '[0-255]' },
+  { name: 'help', alias: 'h', type: Boolean },
+]
 
 const showHelp = (errorMessage?: string) => {
   if (errorMessage) {
     // tslint:disable-next-line:no-console
     console.error('\nERROR:', errorMessage, '\n')
   }
+
+  const sections = [
+    {
+      header: 'MSX Image Converter',
+      content: 'MSX image converter based on Leandro Correia\'s source code'
+    },
+    {
+      header: 'Options',
+      optionList: cliArgumentDefinitions
+    }
+  ]
+  const usage = commandLineUsage(sections)
   // tslint:disable-next-line:no-console
-  console.log('Syntax: ts-node src/cli.ts <input> <output> <contrast>\n')
+  console.log(usage)  
 }
 
 const main = () => {
-  const [ imageFilename, outputFilename, contrastAmountOpt ] = process.argv.slice(2)
-  const contrastAmount = contrastAmountOpt ? parseInt(contrastAmountOpt, 10) : 0
+  const cliArguments = commandLineArgs(cliArgumentDefinitions)
+
+  const imageFilename = cliArguments.input
+  const outputFilename = cliArguments.output 
+  const previewFilename = cliArguments.preview
+  const contrastAmount = cliArguments.contrast || 0
+
   if (!imageFilename) {
     return showHelp('missing input file')
   }
-  if (!outputFilename) {
-    return showHelp('missing output file')
+  if (!outputFilename && !previewFilename) {
+    return showHelp('output and/or preview files required')
   }
-  if (contrastAmount < -255 || contrastAmount > 255) {
+  if (contrastAmount < 0 || contrastAmount > 255) {
     return showHelp('contrast must be between -255 and 255')
   }
   const imageStorage: ImageStorageAdapter = {
@@ -52,7 +84,7 @@ const main = () => {
   const options: ConversionOptions = {
     palette: msxPalette,
     contrastAmount,
-    previewFilename: "preview.png"
+    previewFilename,
   }
   const convertImage = buildImageConverter(imageStorage, imageFunctions, fileStorage)
   try {
