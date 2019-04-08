@@ -1,4 +1,7 @@
-import { Image, Palette, RGBColor } from "./common"
+import { Image, RGBColor, RGBPalette } from "./common"
+import { DataBlocks } from "./transformer"
+
+const MSX_DEFAULT_COLOR_INDEX = 1
 
 export interface ImageStorageAdapter {
   readImage: (filename: string) => Image,
@@ -9,24 +12,35 @@ export interface ImageFunctionsAdapter {
   createImage: (width: number, height: number, color?: RGBColor) => Image,
   contrast: (inputImage: Image, outputImage: Image, amount: number) => void,
   sharpen: (inputImage: Image, outputImage: Image, hard: boolean) => void,
-  quantize: (image1: Image, image2: Image, palette: Palette) => void
+  quantize: (image1: Image, image2: Image, palette: RGBPalette) => void
+  transform: (image: Image, rgbPalette: RGBPalette, defaultColorIndex: number) => DataBlocks,
+}
+
+export interface FileStorageAdapter {
+  saveDataBlocks: (dataBlocks: DataBlocks, filename: string) => void
 }
 
 export interface ConversionOptions {
-  palette: Palette,
-  contrastAmount: number
+  palette: RGBPalette,
+  contrastAmount: number,
+  previewFilename?: string
 }
 
-export const buildImageConverter = (imageStorage: ImageStorageAdapter, imageFunctions: ImageFunctionsAdapter) => {
+export const buildImageConverter = (imageStorage: ImageStorageAdapter, imageFunctions: ImageFunctionsAdapter, 
+  fileStorage: FileStorageAdapter) => {
   const { readImage, saveImage } = imageStorage
-  const { createImage, contrast, sharpen, quantize } = imageFunctions
+  const { createImage, contrast, sharpen, quantize, transform } = imageFunctions
   const convertImage = (inputFilename: string, outputFilename: string, options: ConversionOptions) => {
     const image1 = readImage(inputFilename)
     const image2 = createImage(image1.width, image1.height)
     contrast(image1, image2, options.contrastAmount)
     sharpen(image2, image1, false)
     quantize(image1, image2, options.palette)
-    saveImage(image2, outputFilename)
+    if (options.previewFilename) {
+      saveImage(image2, options.previewFilename)
+    }
+    const dataBlocks = transform(image2, options.palette, MSX_DEFAULT_COLOR_INDEX)
+    fileStorage.saveDataBlocks(dataBlocks, outputFilename)
   }
   return convertImage
 }

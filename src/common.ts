@@ -29,4 +29,6 @@ export interface Rect {
   height: number
 }
 
-export type Palette = RGBColor[]
+export type RGBPalette = RGBColor[]
+
+export type LabPalette = LabColor[]

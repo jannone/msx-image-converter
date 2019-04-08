@@ -1,5 +1,5 @@
-import { ciede2000Lab, RGBToLab } from './ciede'
-import { Image, LabColor, Palette, RGBColor } from './common'
+import { colorDistLab, RGBToLab } from './ciede'
+import { Image, LabColor, RGBColor, RGBPalette } from './common'
 import { getPixel, plot } from './image'
 
 // Color tolerance for dithering (from 0 to 100).
@@ -24,7 +24,7 @@ export const msxPalette = [
   { r: 219, g: 73, b: 182 },
   { r: 182, g: 182, b: 182 },
   { r: 255, g: 255, b: 255 },
-] as Palette
+] as RGBPalette
 
 const mixedColor = (c1: RGBColor, c2: RGBColor): RGBColor => {
   return {
@@ -34,13 +34,11 @@ const mixedColor = (c1: RGBColor, c2: RGBColor): RGBColor => {
   }
 }
 
-const colorDistLab = (l1: LabColor, l2: LabColor) => ciede2000Lab(l1.l, l1.a, l1.b, l2.l, l2.a, l2.b)
-
 // TIP: images are usually better converted to MSX1 if contrast is increased
 // and a sharpen effect is used after reducing them.
 // A good converter could allow the user to crop the image, resample it automatically and then allow user
 // to increase contrast and sharpen it. ;)
-export const quantize = (inputImage: Image, outputImage: Image, palette: Palette) => {
+export const quantize = (inputImage: Image, outputImage: Image, palette: RGBPalette) => {
   let y = 0
   let x = 0
 

@@ -1,4 +1,4 @@
-import { LabColor, RGBColor, XYZColor } from './common'
+import { LabColor, LabPalette, RGBColor, RGBPalette, XYZColor } from './common'
 
 // This code is heavily based on https://github.com/markusn/color-diff
 
@@ -99,7 +99,7 @@ const dhpF = (C1: number, C2: number, h1p: number, h2p: number): number => {
   if (delta < -180) {
     return delta + 360
   }
-  throw new Error()
+  throw new Error("Delta value is off limits: " + JSON.stringify({ C1, C2, h1p, h2p, delta }))
 }
 
 // (14)
@@ -172,4 +172,19 @@ const XYZToLab = (c: XYZColor): LabColor => {
     a: 500 * (X - Y),
     b: 200 * (Y - Z),
   }
+}
+
+export const RGBToLabPalette = (rgbPalette: RGBPalette): LabPalette => 
+  rgbPalette.map((rgbColor) => RGBToLab(rgbColor))
+
+export const colorDistLab = (l1: LabColor, l2: LabColor) => ciede2000Lab(l1.l, l1.a, l1.b, l2.l, l2.a, l2.b)
+
+export const nearestColorIndex = (labPalette: LabPalette, labColor: LabColor, defaultIndex: number): number => {
+  const winner = 
+    labPalette.reduce((prev, paletteLabColor, index) => {
+      const dist = colorDistLab(paletteLabColor, labColor)
+      return (dist < prev[0]) ? [ dist, index ] : prev
+    }, [Number.MAX_SAFE_INTEGER, defaultIndex])
+
+  return winner ? winner[1] : defaultIndex
 }

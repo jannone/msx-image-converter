@@ -1,8 +1,18 @@
-import { buildImageConverter, ConversionOptions, ImageFunctionsAdapter, ImageStorageAdapter } from "./converter"
+import {
+  buildImageConverter, 
+  ConversionOptions, 
+  FileStorageAdapter, 
+  ImageFunctionsAdapter, 
+  ImageStorageAdapter 
+} from "./converter"
 import { readImage } from "./decoder"
 import { contrast, sharpen } from "./filter"
 import { createImage, savePNG } from "./image"
 import { msxPalette, quantize } from "./quantizer"
+import { DataBlocks, transform } from "./transformer"
+
+import fs = require('fs')
+import { generateScreenFile } from "./file";
 
 const showHelp = (errorMessage?: string) => {
   if (errorMessage) {
@@ -33,13 +43,18 @@ const main = () => {
     createImage,
     contrast,
     sharpen,
-    quantize,    
+    quantize,
+    transform
+  }
+  const fileStorage: FileStorageAdapter = {
+    saveDataBlocks: (dataBlocks: DataBlocks, filename: string) => generateScreenFile(dataBlocks, filename)
   }
   const options: ConversionOptions = {
     palette: msxPalette,
-    contrastAmount
+    contrastAmount,
+    previewFilename: "preview.png"
   }
-  const convertImage = buildImageConverter(imageStorage, imageFunctions)
+  const convertImage = buildImageConverter(imageStorage, imageFunctions, fileStorage)
   try {
     convertImage(imageFilename, outputFilename, options)
   } catch (ex) {
