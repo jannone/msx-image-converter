@@ -58,6 +58,10 @@ const main = () => {
   const previewFilename = cliArguments.preview
   const contrastAmount = cliArguments.contrast || 0
 
+  if (cliArguments.help) {
+    showHelp()
+    return
+  }
   if (!imageFilename) {
     return showHelp('missing input file')
   }
