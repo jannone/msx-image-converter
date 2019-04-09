@@ -6,7 +6,7 @@ import {
   ImageStorageAdapter 
 } from "./converter"
 import { readImage } from "./decoder"
-import { generateScreenFile } from "./file"
+import { generateDataFiles, generateScreenFile } from "./file"
 import { contrast, sharpen } from "./filter"
 import { createImage, savePNG } from "./image"
 import { msxPalette, quantize } from "./quantizer"
@@ -20,8 +20,10 @@ const commandLineUsage = require('command-line-usage')
 const cliArgumentDefinitions = [
   { name: 'input', alias: 'i', type: String, defaultOption: true,
     description: 'PNG file to be converted', typeLabel: '{underline file.png}' },
-  { name: 'output', alias: 'o', type: String,
+  { name: 'scr', type: String,
     description: 'SCR file to be generated', typeLabel: '{underline file.scr}' },
+  { name: 'raw', type: String,
+    description: 'Prefix of raw files to be generated', typeLabel: '{underline prefix}' },
   { name: 'preview', alias: 'p', type: String,
     description: 'PNG preview file to be generated', typeLabel: '{underline file.png}' },
   { name: 'contrast', alias: 'c', type: Number,
@@ -54,7 +56,8 @@ const main = () => {
   const cliArguments = commandLineArgs(cliArgumentDefinitions)
 
   const imageFilename = cliArguments.input
-  const outputFilename = cliArguments.output 
+  const scrFilename = cliArguments.scr 
+  const rawPrefix = cliArguments.raw
   const previewFilename = cliArguments.preview
   const contrastAmount = cliArguments.contrast || 0
 
@@ -65,11 +68,11 @@ const main = () => {
   if (!imageFilename) {
     return showHelp('missing input file')
   }
-  if (!outputFilename && !previewFilename) {
-    return showHelp('output and/or preview files required')
+  if (!scrFilename && !rawPrefix && !previewFilename) {
+    return showHelp('scr, raw and/or preview params required')
   }
   if (contrastAmount < 0 || contrastAmount > 255) {
-    return showHelp('contrast must be between -255 and 255')
+    return showHelp('contrast must be between 0 and 255')
   }
   const imageStorage: ImageStorageAdapter = {
     readImage,
@@ -83,7 +86,14 @@ const main = () => {
     transform
   }
   const fileStorage: FileStorageAdapter = {
-    saveDataBlocks: (dataBlocks: DataBlocks, filename: string) => generateScreenFile(dataBlocks, filename)
+    saveDataBlocks: (dataBlocks: DataBlocks) => {
+      if (scrFilename) {
+        generateScreenFile(dataBlocks, scrFilename)
+      }
+      if (rawPrefix) {
+        generateDataFiles(dataBlocks, rawPrefix)
+      }
+    }
   }
   const options: ConversionOptions = {
     palette: msxPalette,
@@ -92,7 +102,7 @@ const main = () => {
   }
   const convertImage = buildImageConverter(imageStorage, imageFunctions, fileStorage)
   try {
-    convertImage(imageFilename, outputFilename, options)
+    convertImage(imageFilename, options)
   } catch (ex) {
     showHelp(ex.message)
   }

@@ -35,3 +35,8 @@ export const generateScreenFile = (dataBlocks: DataBlocks, filename: string) => 
   fs.appendFileSync(filename, intermediateData)
   fs.appendFileSync(filename, dataBlocks.colors)
 }
+
+export const generateDataFiles = (dataBlocks: DataBlocks, filenamePrefix: string) => {
+  fs.writeFileSync(`${filenamePrefix}.shapes.raw`, dataBlocks.shapes)
+  fs.writeFileSync(`${filenamePrefix}.colors.raw`, dataBlocks.colors)
+}

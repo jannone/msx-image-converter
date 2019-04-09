@@ -26,7 +26,7 @@ describe("Converter", () => {
       transform: jest.fn ( (image: Image, palette: RGBPalette) => [] ),
     }
     const fileStorage = {
-      saveDataBlocks: jest.fn( (dataBlocks: DataBlocks, filename: string) => null )
+      saveDataBlocks: jest.fn( (dataBlocks: DataBlocks) => null )
     }
     const options: ConversionOptions = {
       palette: [ {r: 0, g: 0, b: 0} ],
@@ -34,7 +34,7 @@ describe("Converter", () => {
       previewFilename: "preview.png"
     }
     const convertImage = buildImageConverter(imageStorage, imageFunctions, fileStorage)
-    convertImage("input.png", "output.scr", options)
+    convertImage("input.png", options)
 
     expect(imageStorage.readImage.mock.calls.length).toBe(1)
     expect(imageStorage.readImage.mock.calls[0][0]).toBe("input.png")
@@ -46,5 +46,7 @@ describe("Converter", () => {
     expect(imageFunctions.sharpen.mock.calls.length).toBe(1)
     expect(imageFunctions.quantize.mock.calls.length).toBe(1)
     expect(imageFunctions.transform.mock.calls.length).toBe(1)
+
+    expect(fileStorage.saveDataBlocks.mock.calls.length).toBe(1)
   })
 })
