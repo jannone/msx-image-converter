@@ -1,4 +1,4 @@
-import { nearestColorIndex, RGBToLab, RGBToLabPalette } from "./ciede"
+import { nearestColorIndex, RGBToLab, RGBToLabPalette } from "./color"
 import { Image, LabPalette, RGBPalette } from "./common"
 import { getPixel } from "./image"
 

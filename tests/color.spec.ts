@@ -2,7 +2,7 @@ import 'jest'
 
 import * as fs from "fs"
 
-import { ciede2000Lab } from "../src/ciede"
+import { ciede2000Lab } from "../src/color"
 
 const roundFloat = (v: number) => Math.round(v * 10000) / 10000
 
@@ -14,10 +14,10 @@ const givenCIEDEdata = () => {
   })
 }
 
-describe("CIEDE2000", () => {
+describe("Color", () => {
 
   givenCIEDEdata().forEach(([ L1, a1, b1, L2, a2, b2, dist ]) => {
-    it(`distance must be ${dist}`, () => {
+    it(`color distance must be ${dist}`, () => {
       const result = ciede2000Lab(L1, a1, b1, L2, a2, b2)      
       expect(roundFloat(result)).toBe(dist)
     })

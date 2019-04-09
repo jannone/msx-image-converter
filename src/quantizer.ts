@@ -1,4 +1,4 @@
-import { colorDistLab, RGBToLab } from './ciede'
+import { colorDistLab, RGBToLab } from './color'
 import { Image, LabColor, RGBColor, RGBPalette } from './common'
 import { getPixel, plot } from './image'
 
