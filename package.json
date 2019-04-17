@@ -7,7 +7,6 @@
   "scripts": {
     "test": "jest",
     "build": "tsc",
-    "images": "ts-node src/converter.ts",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
@@ -44,5 +43,8 @@
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "bin": {
+    "msx-image-converter": "./lib/cli.js"
+  }
 }
