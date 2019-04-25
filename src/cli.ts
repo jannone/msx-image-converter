@@ -54,6 +54,21 @@ const showHelp = (errorMessage?: string) => {
   console.log(usage)  
 }
 
+export const buildDefaultImageConverter = (fileStorage: FileStorageAdapter) => {
+  const imageStorage: ImageStorageAdapter = {
+    readImage,
+    saveImage: savePNG
+  }
+  const imageFunctions: ImageFunctionsAdapter = {
+    createImage,
+    contrast,
+    sharpen,
+    quantize,
+    transform
+  }
+  return buildImageConverter(imageStorage, imageFunctions, fileStorage)
+}
+
 const main = () => {
   const cliArguments = commandLineArgs(cliArgumentDefinitions)
 
@@ -76,17 +91,6 @@ const main = () => {
   if (contrastAmount < 0 || contrastAmount > 255) {
     return showHelp('contrast must be between 0 and 255')
   }
-  const imageStorage: ImageStorageAdapter = {
-    readImage,
-    saveImage: savePNG
-  }
-  const imageFunctions: ImageFunctionsAdapter = {
-    createImage,
-    contrast,
-    sharpen,
-    quantize,
-    transform
-  }
   const fileStorage: FileStorageAdapter = {
     saveDataBlocks: (dataBlocks: DataBlocks) => {
       if (scrFilename) {
@@ -97,12 +101,12 @@ const main = () => {
       }
     }
   }
+  const convertImage = buildDefaultImageConverter(fileStorage)
   const options: ConversionOptions = {
     palette: msxPalette,
     contrastAmount,
     previewFilename,
   }
-  const convertImage = buildImageConverter(imageStorage, imageFunctions, fileStorage)
   try {
     convertImage(imageFilename, options)
   } catch (ex) {
